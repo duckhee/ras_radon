@@ -2,3 +2,15 @@ node_modules
 config.json
 config.js
 npm-debug.log
+<<<<<<< HEAD
+=======
+.dist
+.DS_Store
+bower_components
+fb-token.json
+speech/snowboydecoder.pyc
+speech/snowboydetect.pyc
+.vscode
+keyfile.json
+smart-mirror.log
+>>>>>>> 4b31fdc964218c50d97eb667beb3d05140f76b99
