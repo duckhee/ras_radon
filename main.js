@@ -4,7 +4,7 @@ const electron = require('electron')
     // Child Process for keyword spotter
 const { spawn, exec } = require('child_process')
     // Smart mirror remote
-const remote = require('./remote.js')
+    //const remote = require('./remote.js')
     // Module to control application life.
 const app = electron.app
     // Module to create native browser window.
