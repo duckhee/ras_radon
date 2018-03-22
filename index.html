@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Zephirus Arua</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+    <meta content="Radon,iot" name="keywords" />
+    <meta content="Radon,iot" name="description" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- BEGIN FONT PLUGIN STYLES -->
+    <link href="./app/css/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="./app/css/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <!-- END FONT PLUGIN STYLES -->
+    <link href="./app/css/style.css" rel="stylesheet" type="text/css" />
+    <!-- BEGIN SCROLL PLUGIN -->
+    <script src="./app/js/jquery.min.js"></script>
+    <script src="./app/js/jquery.nicescroll.min.js"></script>
+    <script src="./app/js/iphone-style-checkboxes.js" type="text/javascript"></script>
+    <script>
+        var nice1, nice2;
+        var body;
+        var off;
+
+        $(window).load(function() {
+            off = $("#boxscroll").position();
+            off.top += 2;
+            off.left += 2;
+            $("#boxscroll").scroll();
+        });
+
+        function initScroll() {
+
+            var tb = $('#nctouch').prop("checked");
+
+            if (nice1) nice1.remove();
+
+            nice1 = $("#boxscroll").niceScroll({
+                touchbehavior: tb,
+                cursorcolor: "#000",
+                cursoropacitymax: 0.6,
+                cursorwidth: 4,
+                horizrailenabled: true
+            });
+            $("#ncver").html(nice1.version);
+
+            $("#boxscroll").scroll(function(e) {
+                if (!off) return;
+                var px = $("#boxscroll").scrollLeft() - off.left;
+                var py = $("#boxscroll").scrollTop() - off.top;
+                body.style.backgroundPosition = -px + "px " + -py + "px";
+
+                $("#infoscroll1").html($("#boxscroll").scrollLeft() + 'x' + $("#boxscroll").scrollTop());
+            });
+
+            $("#boxscroll").scroll();
+
+            //$("#boxscroll2 div").html($("#boxscroll").html());
+
+            if (nice2) nice2.remove();
+
+            nice2 = $("#boxscroll2").niceScroll("#boxscroll2 div.mp-real-html", {
+                touchbehavior: tb,
+                cursorcolor: "#FF0000",
+                cursoropacitymax: 0.6,
+                cursorwidth: 4,
+                horizrailenabled: true
+            });
+            /*    
+                nice2.scrollstart(function(info){
+                  console.log(info);
+                });
+            */
+
+            /*
+                nice2.scrollend(function(info){
+                  console.log(info);
+                });
+            */
+
+            $("#boxscroll2").scroll(function(e) {
+                var me = $(this);
+                $("#infoscroll2").html(me.scrollLeft() + 'x' + me.scrollTop());
+            });
+
+            //    console.log($(":nicescroll").getNiceScroll());
+
+        }
+
+        $(document).ready(function() {
+
+            body = document.getElementsByTagName("body")[0];
+
+            $('body').niceScroll({
+                cursoropacitymax: 1,
+                cursorwidth: 5
+            });
+
+            $('#nctouch').iphoneStyle().change(function() {
+                initScroll();
+            });
+
+            initScroll();
+
+        });
+
+        function getScroll(name) {
+            $(name).scrollTop(Math.floor(Math.random() * 3000));
+        }
+
+        function getScroll2D(name) {
+            $(name).getNiceScroll().doScrollPos(Math.floor(Math.random() * 4000), Math.floor(Math.random() * 4000), 150);
+        }
+    </script>
+    <!-- BEGIN SCROLL PLUGIN-->
+
+
+
+</head>
+
+
+<body>
+    <!--body start-->
+    <div class="body-wrap">
+
+
+
+        <div class="body-ctn-area">
+
+            <div class="dayntime-zone">
+                <span class="dtz-day">september 28, 2014</span>
+            </div>
+            <div class="info-zone">
+                <div class="width-100 info-radon">
+                    <span class="info-unit">Radon</span>
+                    <span class="info-txt">30.2</span>
+                    <span class="info-unit"> pCi/L</span>
+                </div>
+            </div>
+            <div class="info-zone">
+                <div class="width-50 info-temp">
+                    <span class="info-txt">67.2</span>
+                    <span class="info-unit">℉</span>
+                </div>
+                <div class="width-50 info-huminity">
+                    <span class="info-txt">58.3</span>
+                    <span class="info-unit">％</span>
+                </div>
+            </div>
+        </div>
+        <!--colse body-top-area-->
+
+
+    </div>
+    <!--wrap close-->
+
+
+
+
+
+
+
+</body>
+
+</html>
