@@ -1,0 +1,13 @@
+node_modules
+config.json
+config.js
+npm-debug.log
+.dist
+.DS_Store
+bower_components
+fb-token.json
+speech/snowboydecoder.pyc
+speech/snowboydetect.pyc
+.vscode
+keyfile.json
+smart-mirror.log
