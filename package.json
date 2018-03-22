@@ -1,22 +1,19 @@
 {
-    "name": "radon_app",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "install": "bower install",
-        "start": "electron main.js ",
-        "train-model": "electron scripts/train-model.js",
-        "sonus": "node sonus.js",
-        "motion": "sudo node motion.js",
-        "enable-motion": "npm install johnny-five raspi-io",
-        "update": "git pull && npm install",
-        "wiredep": "wiredep -s index.html",
-        "test": "eslint . --ignore-path .gitignore",
-        "test-fix": "eslint . --ignore-path .gitignore --fix"
-    },
-},
-"author": "",
-"license": "ISC"
+  "name": "ras_radon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duckhee/ras_radon.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/duckhee/ras_radon/issues"
+  },
+  "homepage": "https://github.com/duckhee/ras_radon#readme"
 }
