@@ -1,220 +1,56 @@
-/* global __dirname */
-/* global process */
-const electron = require('electron')
-    // Child Process for keyword spotter
-const { spawn, exec } = require('child_process')
-    // Smart mirror remote
-    //const remote = require('./remote.js')
-    // Module to control application life.
-const app = electron.app
-    // Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow
-    // Prevent the monitor from going to sleep.
-const powerSaveBlocker = electron.powerSaveBlocker
-    //powerSaveBlocker.start('prevent-display-sleep')
+const { app, BrowserWindow } = require('electron')
+const path = require('path')
+const url = require('url')
 
-// Launching the mirror in dev mode
-const DevelopmentMode = process.argv.includes("dev")
-
-// Load the smart mirror config
-let config
-let firstRun = false
-    /*
-    try {
-        config = require("./config.json")
-    } catch (e) {
-        let error = "Unknown Error"
-        config = require("./remote/.config.default.json")
-        firstRun = true
-        if (typeof e.code !== 'undefined' && e.code === 'MODULE_NOT_FOUND') {
-            error = "'config.json' not found. \nYou can configure your mirror at the remote address below..."
-        } else if (typeof e.message !== 'undefined') {
-            console.log(e)
-            error = "Syntax Error. \nLooks like there's an error in your config file: " + e.message + '\n' +
-                'Protip: You might want to paste your config file into a JavaScript validator like http://jshint.com/'
-        }
-        console.log(error)
-    }
-    */
-    // Keep a global reference of the window object, if you don't, the window will
-    // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+// 윈도우 객체를 전역에 유지합니다. 만약 이렇게 하지 않으면
+// 자바스크립트 GC가 일어날 때 창이 멋대로 닫혀버립니다.
+let win
 
 function createWindow() {
+    // 새로운 브라우저 창을 생성합니다.
+    win = new BrowserWindow({ width: 800, height: 600 })
 
-    // Get the displays and render the mirror on a secondary screen if it exists
-    var atomScreen = electron.screen
-    var displays = atomScreen.getAllDisplays()
-    var externalDisplay = null
-    for (var i in displays) {
-        if (displays[i].bounds.x > 0 || displays[i].bounds.y > 0) {
-            externalDisplay = displays[i]
-            break
-        }
-    }
+    // 그리고 현재 디렉터리의 index.html을 로드합니다.
+    win.loadURL(url.format({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file:',
+        slashes: true
+    }))
 
-    var browserWindowOptions = { width: 800, height: 600, icon: 'favicon.ico', kiosk: !DevelopmentMode, autoHideMenuBar: true, darkTheme: true }
-    if (externalDisplay) {
-        browserWindowOptions.x = externalDisplay.bounds.x + 50
-        browserWindowOptions.y = externalDisplay.bounds.y + 50
-    }
+    // 개발자 도구를 엽니다.
+    win.webContents.openDevTools()
 
-    // Create the browser window.
-    mainWindow = new BrowserWindow(browserWindowOptions)
-
-    // and load the index.html of the app.
-    mainWindow.loadURL('file://' + __dirname + '/index.html')
-
-    // Open the DevTools if run with "npm start dev"
-    if (DevelopmentMode) {
-        mainWindow.webContents.openDevTools()
-    }
-
-    // Emitted when the window is closed.
-    mainWindow.on('closed', function() {
-        // Dereference the window object, usually you would store windows
-        // in an array if your app supports multi windows, this is the time
-        // when you should delete the corresponding element.
-        mainWindow = null
-    })
-}
-/*
-// Initilize the keyword spotter
-if (config && config.speech && !firstRun) {
-    var kwsProcess = spawn('node', ['./sonus.js'], { detached: false })
-        // Handel messages from node
-    kwsProcess.stderr.on('data', function(data) {
-        var message = data.toString()
-        console.error("ERROR", message.substring(4))
-    })
-
-    kwsProcess.stdout.on('data', function(data) {
-        var message = data.toString()
-        if (message.startsWith('!h:')) {
-            mainWindow.webContents.send('hotword', true)
-        } else if (message.startsWith('!p:')) {
-            mainWindow.webContents.send('partial-results', message.substring(4))
-        } else if (message.startsWith('!f:')) {
-            mainWindow.webContents.send('final-results', message.substring(4))
-        } else {
-            console.error(message.substring(3))
-        }
+    // 창이 닫히면 호출됩니다.
+    win.on('closed', () => {
+        // 윈도우 객체의 참조를 삭제합니다. 보통 멀티 윈도우 지원을 위해
+        // 윈도우 객체를 배열에 저장하는 경우가 있는데 이 경우
+        // 해당하는 모든 윈도우 객체의 참조를 삭제해 주어야 합니다.
+        win = null
     })
 }
 
-if (config.remote && config.remote.enabled || firstRun) {
-    remote.start()
-
-    // Deturmine the local IP address
-    const interfaces = require('os').networkInterfaces()
-    let addresses = []
-    for (let k in interfaces) {
-        for (let k2 in interfaces[k]) {
-            let address = interfaces[k][k2]
-            if (address.family === 'IPv4' && !address.internal) {
-                addresses.push(address.address)
-            }
-        }
-    }
-    console.log('Remote listening on http://%s:%d', addresses[0], config.remote.port)
-
-    remote.on('command', function(command) {
-        mainWindow.webContents.send('final-results', command)
-    })
-
-    remote.on('connected', function() {
-        mainWindow.webContents.send('connected')
-    })
-
-    remote.on('disconnected', function() {
-        mainWindow.webContents.send('disconnected')
-    })
-
-    remote.on('devtools', function(open) {
-        if (open) {
-            mainWindow.webContents.openDevTools()
-        } else {
-            mainWindow.webContents.closeDevTools()
-        }
-    })
-
-    remote.on('kiosk', function() {
-        if (mainWindow.isKiosk()) {
-            mainWindow.setKiosk(false)
-        } else {
-            mainWindow.setKiosk(true)
-        }
-    })
-
-    remote.on('reload', function() {
-        mainWindow.reload()
-    })
-
-    remote.on('wakeUp', function() {
-        mainWindow.webContents.send('remoteWakeUp', true)
-    })
-    remote.on('sleep', function() {
-        mainWindow.webContents.send('remoteSleep', true)
-    })
-
-    remote.on('relaunch', function() {
-        console.log("Relaunching...")
-        app.relaunch()
-        app.quit()
-    })
-}
-
-// Motion detection
-if (config.motion && config.motion.enabled) {
-    var mtnProcess = spawn('npm', ['run', 'motion'], { detached: false })
-        // Handel messages from node
-    mtnProcess.stderr.on('data', function(data) {
-        var message = data.toString()
-        console.error("ERROR", message.substring(4))
-    })
-
-    mtnProcess.stdout.on('data', function(data) {
-        var message = data.toString()
-        if (message.startsWith('!s:')) {
-            console.log(message.substring(3))
-            mainWindow.webContents.send('motionstart', true)
-        } else if (message.startsWith('!e:')) {
-            console.log(message.substring(3))
-            mainWindow.webContents.send('motionend', true)
-        } else if (message.startsWith('!c:')) {
-            console.log(message.substring(3))
-            mainWindow.webContents.send('calibrated', true)
-        } else if (message.startsWith('!E:')) {
-            console.log(message.substring(3))
-            mainWindow.webContents.send('Error', message.substring(3))
-            mtnProcess.kill();
-        } else {
-            console.error(message)
-        }
-    })
-}
-*/
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+// 이 메서드는 Electron의 초기화가 끝나면 실행되며 브라우저
+// 윈도우를 생성할 수 있습니다. 몇몇 API는 이 이벤트 이후에만
+// 사용할 수 있습니다.
 app.on('ready', createWindow)
 
-// Quit when all windows are closed.
-app.on('window-all-closed', function() {
-    app.quit()
+// 모든 창이 닫히면 애플리케이션 종료.
+app.on('window-all-closed', () => {
+    // macOS의 대부분의 애플리케이션은 유저가 Cmd + Q 커맨드로 확실하게
+    // 종료하기 전까지 메뉴바에 남아 계속 실행됩니다.
+    if (process.platform !== 'darwin') {
+        app.quit()
+    }
 })
 
-// No matter how the app is quit, we should clean up after ourselvs
-app.on('will-quit', function() {
-    if (kwsProcess) {
-        kwsProcess.kill()
-    }
-    // While cleaning up we should turn the screen back on in the event 
-    // the program exits before the screen is woken up
-    if (mtnProcess) {
-        mtnProcess.kill()
-    }
-    if (config.autoTimer && config.autoTimer.mode !== "disabled" && config.autoTimer.wakeCmd) {
-        exec(config.autoTimer.wakeCmd).kill()
+app.on('activate', () => {
+    // macOS에선 보통 독 아이콘이 클릭되고 나서도
+    // 열린 윈도우가 없으면, 새로운 윈도우를 다시 만듭니다.
+    if (win === null) {
+        createWindow()
     }
 })
+
+// 이 파일엔 제작할 애플리케이션에 특화된 메인 프로세스 코드를
+// 포함할 수 있습니다. 또한 파일을 분리하여 require하는 방법으로
+// 코드를 작성할 수도 있습니다.
