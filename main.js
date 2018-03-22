@@ -19,24 +19,25 @@ const DevelopmentMode = process.argv.includes("dev")
 // Load the smart mirror config
 let config
 let firstRun = false
-try {
-    config = require("./config.json")
-} catch (e) {
-    let error = "Unknown Error"
-    config = require("./remote/.config.default.json")
-    firstRun = true
-    if (typeof e.code !== 'undefined' && e.code === 'MODULE_NOT_FOUND') {
-        error = "'config.json' not found. \nYou can configure your mirror at the remote address below..."
-    } else if (typeof e.message !== 'undefined') {
-        console.log(e)
-        error = "Syntax Error. \nLooks like there's an error in your config file: " + e.message + '\n' +
-            'Protip: You might want to paste your config file into a JavaScript validator like http://jshint.com/'
+    /*
+    try {
+        config = require("./config.json")
+    } catch (e) {
+        let error = "Unknown Error"
+        config = require("./remote/.config.default.json")
+        firstRun = true
+        if (typeof e.code !== 'undefined' && e.code === 'MODULE_NOT_FOUND') {
+            error = "'config.json' not found. \nYou can configure your mirror at the remote address below..."
+        } else if (typeof e.message !== 'undefined') {
+            console.log(e)
+            error = "Syntax Error. \nLooks like there's an error in your config file: " + e.message + '\n' +
+                'Protip: You might want to paste your config file into a JavaScript validator like http://jshint.com/'
+        }
+        console.log(error)
     }
-    console.log(error)
-}
-
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
+    */
+    // Keep a global reference of the window object, if you don't, the window will
+    // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
 function createWindow() {
@@ -77,7 +78,7 @@ function createWindow() {
         mainWindow = null
     })
 }
-
+/*
 // Initilize the keyword spotter
 if (config && config.speech && !firstRun) {
     var kwsProcess = spawn('node', ['./sonus.js'], { detached: false })
@@ -192,7 +193,7 @@ if (config.motion && config.motion.enabled) {
         }
     })
 }
-
+*/
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
