@@ -69,7 +69,5 @@
             "RRule": false
         }
     },
-    "devDependencies": {
-        "@angular/cli": "^1.7.3"
-    }
+
 }
